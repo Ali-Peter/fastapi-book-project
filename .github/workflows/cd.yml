@@ -19,3 +19,4 @@ jobs:
             git pull
             systemctl restart fastapi
             systemctl restart nginx
+            sudo systemctl restart fastapi
