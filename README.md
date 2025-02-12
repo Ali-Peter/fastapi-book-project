@@ -1,11 +1,9 @@
 # FastAPI Book Management API
 
 ## Overview
-
 This project is a RESTful API built with FastAPI for managing a book collection. It provides comprehensive CRUD (Create, Read, Update, Delete) operations for books with proper error handling, input validation, and documentation.
 
 ## Features
-
 - 📚 Book management (CRUD operations)
 - ✅ Input validation using Pydantic models
 - 🔍 Enum-based genre classification
@@ -14,7 +12,6 @@ This project is a RESTful API built with FastAPI for managing a book collection.
 - 🔒 CORS middleware enabled
 
 ## Project Structure
-
 ```
 fastapi-book-project/
 ├── api/
@@ -37,64 +34,54 @@ fastapi-book-project/
 ```
 
 ## Technologies Used
-
 - Python 3.12
 - FastAPI
 - Pydantic
 - pytest
 - uvicorn
+- Nginx
+- AWS EC2
 
 ## Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/hng12-devbotops/fastapi-book-project.git
-cd fastapi-book-project
+### Clone the repository:
+```sh
+git clone https://github.com/Ali-Peter/fastapi-book-project.git
+cd hng12-stage2-fastapi-book-project
 ```
 
-2. Create a virtual environment:
-
-```bash
+### Create a virtual environment:
+```sh
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install dependencies:
-
-```bash
+### Install dependencies:
+```sh
 pip install -r requirements.txt
 ```
 
 ## Running the Application
-
-1. Start the server:
-
-```bash
+### Start the server:
+```sh
 uvicorn main:app
 ```
 
-2. Access the API documentation:
-
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+### Access the API documentation:
+- Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+- ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ## API Endpoints
-
 ### Books
-
-- `GET /api/v1/books/` - Get all books
-- `GET /api/v1/books/{book_id}` - Get a specific book
-- `POST /api/v1/books/` - Create a new book
-- `PUT /api/v1/books/{book_id}` - Update a book
-- `DELETE /api/v1/books/{book_id}` - Delete a book
+- **GET** `/api/v1/books/` - Get all books
+- **GET** `/api/v1/books/{book_id}` - Get a specific book
+- **POST** `/api/v1/books/` - Create a new book
+- **PUT** `/api/v1/books/{book_id}` - Update a book
+- **DELETE** `/api/v1/books/{book_id}` - Delete a book
 
 ### Health Check
-
-- `GET /healthcheck` - Check API status
+- **GET** `/healthcheck` - Check API status
 
 ## Book Schema
-
 ```json
 {
   "id": 1,
@@ -105,8 +92,7 @@ uvicorn main:app
 }
 ```
 
-Available genres:
-
+### Available genres:
 - Science Fiction
 - Fantasy
 - Horror
@@ -115,32 +101,102 @@ Available genres:
 - Thriller
 
 ## Running Tests
-
-```bash
+```sh
 pytest
 ```
 
 ## Error Handling
-
 The API includes proper error handling for:
-
 - Non-existent books
 - Invalid book IDs
 - Invalid genre types
 - Malformed requests
 
-## Contributing
+## Deployment Guide
+### AWS EC2 Setup
+1. Launch an Ubuntu-based EC2 instance through the AWS Console.
+2. Download and securely store your key pair file (.pem).
+3. Configure security groups to allow inbound traffic on ports 22 (SSH), 80 (HTTP), and 443 (HTTPS).
 
+### Server Configuration
+#### Establish an SSH connection to your EC2 instance:
+```sh
+ssh -i path/to/your-key.pem ubuntu@your-ec2-public-ip
+```
+
+#### Update the system and install required packages:
+```sh
+sudo apt update && sudo apt install nginx python3-venv python3-full -y
+```
+
+### Application Setup
+```sh
+git clone https://github.com/Ali-Peter/fastapi-book-project.git
+cd fastapi-book-project
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Nginx Configuration
+#### Replace the default Nginx configuration:
+```sh
+sudo rm /etc/nginx/nginx.conf
+sudo nano /etc/nginx/nginx.conf
+```
+
+#### Add the configuration from `nginx.conf.example`, replacing `$SERVER_NAME` with your instance's public DNS, and apply:
+```sh
+sudo systemctl restart nginx
+```
+
+### FastAPI Service Configuration
+#### Create a systemd service file for the FastAPI application:
+```sh
+sudo nano /etc/systemd/system/fastapi.service
+```
+
+#### Add the following configuration:
+```
+[Unit]
+Description=FastAPI Book Project
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/fastapi-book-project
+Environment="PATH=/home/ubuntu/fastapi-book-project/venv/bin"
+ExecStart=/home/ubuntu/fastapi-book-project/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### Enable and start the service:
+```sh
+sudo systemctl enable fastapi
+sudo systemctl start fastapi
+```
+
+## Contributing
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
+2. Create a feature branch:
+   ```sh
+   git checkout -b feature/AmazingFeature
+   ```
+3. Commit changes:
+   ```sh
+   git commit -m 'Add AmazingFeature'
+   ```
+4. Push to branch:
+   ```sh
+   git push origin feature/AmazingFeature
+   ```
 5. Open a Pull Request
 
 ## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Support
-
 For support, please open an issue in the GitHub repository.
+
